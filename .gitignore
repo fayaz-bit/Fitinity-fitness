@@ -1,0 +1,16 @@
+# Node
+node_modules/
+
+# Java heap dumps
+*.hprof
+
+# Build artifacts
+build/
+**/build/
+
+# Firebase local cache
+.firebase/
+
+# OS
+.DS_Store
+Thumbs.db
