@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 const Color violet = Color(0xFF8416BC);
 
@@ -31,7 +32,7 @@ class MealInputWidgets {
             style: const TextStyle(color: Colors.white),
             onChanged: (_) {
               if (localError && controller.text.trim().isNotEmpty) {
-                onValidInput(); // ✅ informs parent
+                onValidInput();
               }
             },
             decoration: InputDecoration(
@@ -73,6 +74,10 @@ class MealInputWidgets {
           ),
           child: TextField(
             controller: controller,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
             style: const TextStyle(color: Colors.white, fontSize: 13),
             onChanged: (_) {
               if (localError && controller.text.trim().isNotEmpty) {
@@ -96,7 +101,6 @@ class MealInputWidgets {
     );
   }
 
-  /// ✅ Steps field
   static Widget buildTextFieldValidated(
     TextEditingController controller,
     bool showError, {
@@ -142,13 +146,12 @@ class MealInputWidgets {
     );
   }
 
-  /// ✅ Macros
   static Widget buildMacroField(
       String label, TextEditingController controller) {
     return TextField(
       controller: controller,
-      style: const TextStyle(color: Colors.white),
       keyboardType: TextInputType.number,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: Colors.white70, fontSize: 12),
@@ -163,7 +166,6 @@ class MealInputWidgets {
     );
   }
 
-  /// ✅ Add button
   static Widget buildAddButton(String label, VoidCallback onPressed) {
     return SizedBox(
       width: double.infinity,
