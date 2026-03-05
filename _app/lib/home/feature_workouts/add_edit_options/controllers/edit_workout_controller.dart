@@ -47,9 +47,14 @@ class EditWorkoutController {
     final reps = existingWorkout['reps']?.split(' - ') ?? ["8", "12"];
     fromReps = int.tryParse(reps[0]) ?? 8;
     toReps = int.tryParse(reps[1]) ?? 12;
+
+    if (existingWorkout['videoFilePath'] != null &&
+        existingWorkout['videoFilePath']!.isNotEmpty) {
+      pickedVideo = File(existingWorkout['videoFilePath']!);
+    }
   }
 
-  /// 🔥 LOAD ADMIN VIDEO STATUS
+  ///  LOAD ADMIN VIDEO STATUS
   Future<void> loadVideoSettings() async {
     final status = await AdminVideosDB.getFieldsStatus();
 
