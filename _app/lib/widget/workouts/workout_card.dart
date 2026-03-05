@@ -69,7 +69,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => FullScreenVideoPlayer(controller: _controller!),
+        builder: (_) => WorkoutVideoPlayer(controller: _controller!),
       ),
     );
   }
