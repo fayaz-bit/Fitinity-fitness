@@ -51,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
 
-      //  APP BAR
+      // APP BAR
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
@@ -79,22 +79,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
 
-      //  BODY
+      // BODY
       body: SafeArea(
         child: Column(
           children: [
             const SizedBox(height: 30),
 
-            //  Avatar
+            // AVATAR
             Stack(
               children: [
                 CircleAvatar(
                   radius: 55,
-                  // ignore: unnecessary_null_comparison
-                  backgroundImage: user.imagePath != null
-                      ? FileImage(File(user.imagePath))
+                  backgroundImage: (user.imagePath?.isNotEmpty ?? false)
+                      ? FileImage(File(user.imagePath!))
                       : null,
                   backgroundColor: Colors.grey[800],
+                  child: (user.imagePath?.isEmpty ?? true)
+                      ? const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 40,
+                        )
+                      : null,
                 ),
                 Positioned(
                   bottom: 0,
@@ -107,8 +113,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         shape: BoxShape.circle,
                         color: purple,
                       ),
-                      child: const Icon(Icons.camera_alt,
-                          size: 18, color: Colors.white),
+                      child: const Icon(
+                        Icons.camera_alt,
+                        size: 18,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 )
@@ -138,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 25),
 
-            //  DETAILS CARD
+            // DETAILS CARD
             ProfileDetailsCard(
               user: user,
               onEdit: () {
@@ -168,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
 
-      //  BOTTOM NAV
+      // BOTTOM NAV
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 2,
         backgroundColor: Colors.black,
