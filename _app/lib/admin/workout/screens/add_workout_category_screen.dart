@@ -19,13 +19,50 @@ class _AddWorkoutCategoryPageState extends State<AddWorkoutCategoryPage> {
       AddWorkoutCategoryController();
 
   Future<void> _pickImg() async {
-    final picker = ImagePicker();
-    final XFile? img = await picker.pickImage(source: ImageSource.camera);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.black,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: Colors.white),
+                title: const Text("Take Photo",
+                    style: TextStyle(color: Colors.white)),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final picker = ImagePicker();
+                  final XFile? img =
+                      await picker.pickImage(source: ImageSource.camera);
 
-    if (img != null) {
-      controller.pickImage(File(img.path));
-      setState(() {});
-    }
+                  if (img != null) {
+                    controller.pickImage(File(img.path));
+                    setState(() {});
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo, color: Colors.white),
+                title: const Text("Upload from Gallery",
+                    style: TextStyle(color: Colors.white)),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final picker = ImagePicker();
+                  final XFile? img =
+                      await picker.pickImage(source: ImageSource.gallery);
+
+                  if (img != null) {
+                    controller.pickImage(File(img.path));
+                    setState(() {});
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
