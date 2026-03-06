@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import '../../../../widget/workouts/workout_card.dart';
-import '../../../../widget/dialogue/confirm_delete_dialogue.dart'; // ✅ Correct import
+import '../../../../widget/dialogue/confirm_delete_dialogue.dart';
 
 class ChestWorkoutList extends StatelessWidget {
   final Box box;
@@ -17,15 +17,44 @@ class ChestWorkoutList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /// EMPTY STATE UI
     if (box.isEmpty) {
-      return const Center(
-        child: Text(
-          'No workouts added yet!',
-          style: TextStyle(color: Colors.white70),
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.fitness_center,
+                size: 70,
+                color: Colors.grey.shade700,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "No Chest Workouts Yet",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Add your first chest workout to start building your routine.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
 
+    /// WORKOUT LIST
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: box.length,

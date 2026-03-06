@@ -50,15 +50,6 @@ class _WorkoutCardState extends State<WorkoutCard> {
   }
 
   @override
-  void didUpdateWidget(covariant WorkoutCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.videoFilePath != widget.videoFilePath) {
-      _controller?.dispose();
-      _initVideoController();
-    }
-  }
-
-  @override
   void dispose() {
     _controller?.dispose();
     super.dispose();
@@ -66,6 +57,7 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
   void _openFullScreenVideo() {
     if (_controller == null) return;
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -76,57 +68,94 @@ class _WorkoutCardState extends State<WorkoutCard> {
 
   Future<void> _launchURL(String url) async {
     final uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      throw Exception('Could not launch $url');
-    }
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF202020),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFF1F1F1F),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black54,
+            blurRadius: 6,
+            offset: Offset(0, 3),
+          )
+        ],
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.name,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700)),
-          const SizedBox(height: 12),
-          _info("Duration", widget.duration),
-          _info("Sets", widget.sets),
-          _info("Reps", widget.reps),
+          /// Workout Name
+          Text(
+            widget.name,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 19,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          /// Workout Info (VERTICAL)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _info(Icons.timer, widget.duration),
+              const SizedBox(height: 6),
+              _info(Icons.repeat, widget.sets),
+              const SizedBox(height: 6),
+              _info(Icons.fitness_center, widget.reps),
+            ],
+          ),
+
+          /// Video Title
           if (widget.videoTitle != null && widget.videoTitle!.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text("Video Title: ${widget.videoTitle}",
-                style: const TextStyle(color: Colors.white70)),
-          ],
-          if (widget.videoUrl != null && widget.videoUrl!.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            TextButton.icon(
-              onPressed: () => _launchURL(widget.videoUrl!),
-              icon: const Icon(Icons.link, color: Colors.blueAccent),
-              label: const Text(
-                "Watch Video",
-                style: TextStyle(
-                    color: Colors.blueAccent,
-                    decoration: TextDecoration.underline),
+            const SizedBox(height: 12),
+            Text(
+              widget.videoTitle!,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontStyle: FontStyle.italic,
               ),
             ),
           ],
+
+          /// Video URL
+          if (widget.videoUrl != null && widget.videoUrl!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: () => _launchURL(widget.videoUrl!),
+              child: Row(
+                children: const [
+                  Icon(Icons.link, color: Colors.blueAccent),
+                  SizedBox(width: 6),
+                  Text(
+                    "Watch Video",
+                    style: TextStyle(
+                      color: Colors.blueAccent,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          /// Local Video Preview
           if (_controller != null && _controller!.value.isInitialized) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: 14),
             GestureDetector(
               onTap: _openFullScreenVideo,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  height: 150,
+                  height: 160,
                   width: double.infinity,
                   color: Colors.black,
                   child: Stack(
@@ -140,12 +169,17 @@ class _WorkoutCardState extends State<WorkoutCard> {
                           child: VideoPlayer(_controller!),
                         ),
                       ),
-                      Icon(
-                        _controller!.value.isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                        color: Colors.white,
-                        size: 40,
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black45,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        padding: const EdgeInsets.all(10),
+                        child: const Icon(
+                          Icons.play_arrow,
+                          color: Colors.white,
+                          size: 36,
+                        ),
                       ),
                     ],
                   ),
@@ -153,35 +187,59 @@ class _WorkoutCardState extends State<WorkoutCard> {
               ),
             ),
           ],
-          const SizedBox(height: 14),
+
+          const SizedBox(height: 16),
+
+          /// Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              OutlinedButton(
+              OutlinedButton.icon(
                 onPressed: widget.onEdit,
+                icon: const Icon(Icons.edit, size: 18),
+                label: const Text("Edit"),
                 style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.purple)),
-                child:
-                    const Text('Edit', style: TextStyle(color: Colors.white)),
+                  foregroundColor: Colors.purple,
+                  side: const BorderSide(color: Colors.purple),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
-              const SizedBox(width: 8),
-              TextButton(
+              const SizedBox(width: 10),
+              ElevatedButton.icon(
                 onPressed: widget.onDelete,
-                style: TextButton.styleFrom(backgroundColor: Colors.redAccent),
-                child:
-                    const Text('Delete', style: TextStyle(color: Colors.white)),
+                icon: const Icon(Icons.delete, size: 18),
+                label: const Text("Delete"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
             ],
-          ),
+          )
         ],
       ),
     );
   }
 
-  Widget _info(String label, String value) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: const TextStyle(color: Colors.white70, fontSize: 15)),
-      Text(value, style: const TextStyle(color: Colors.white70, fontSize: 15))
-    ]);
+  /// Info widget
+  Widget _info(IconData icon, String value) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.purple, size: 18),
+        const SizedBox(width: 6),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 15,
+          ),
+        ),
+      ],
+    );
   }
 }
