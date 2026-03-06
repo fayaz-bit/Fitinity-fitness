@@ -14,12 +14,6 @@ class MealController {
   final TextEditingController fatsController = TextEditingController();
   final TextEditingController caloriesController = TextEditingController();
 
-  /// Ingredient object structure:
-  /// {
-  ///   "ingredient": TextEditingController(),
-  ///   "quantity": TextEditingController(),
-  ///   "unit": TextEditingController()   ← dropdown writes value here
-  /// }
   List<Map<String, TextEditingController>> ingredients = [];
   List<TextEditingController> steps = [];
 
@@ -43,7 +37,7 @@ class MealController {
     });
   }
 
-  /// Load existing meal data
+  /// LOAD EXISTING MEAL
   void initExistingMeal(Map<String, String> meal) async {
     final fields = await MealFieldDB.getEnabledFields();
     enabledFields = fields;
@@ -56,14 +50,23 @@ class MealController {
     mealNameController.text = meal['name'] ?? "";
     descriptionController.text = meal['description'] ?? "";
 
-    if (enabledFields['protein']!)
+    if (enabledFields['protein']!) {
       proteinController.text = meal['protein'] ?? "";
-    if (enabledFields['carbs']!) carbsController.text = meal['carbs'] ?? "";
-    if (enabledFields['fats']!) fatsController.text = meal['fats'] ?? "";
-    if (enabledFields['calories']!)
-      caloriesController.text = meal['calories'] ?? "";
+    }
 
-    /// INGREDIENT PARSING
+    if (enabledFields['carbs']!) {
+      carbsController.text = meal['carbs'] ?? "";
+    }
+
+    if (enabledFields['fats']!) {
+      fatsController.text = meal['fats'] ?? "";
+    }
+
+    if (enabledFields['calories']!) {
+      caloriesController.text = meal['calories'] ?? "";
+    }
+
+    /// ---------------- INGREDIENT PARSING (FIXED) ----------------
     try {
       final ingData = meal['ingredients'];
 
@@ -77,23 +80,29 @@ class MealController {
             if (item.trim().isEmpty) continue;
 
             final cleaned = item.replaceAll("{", "").replaceAll("}", "").trim();
+
             if (cleaned.isEmpty) continue;
 
-            final parts = cleaned.split(',').map((e) => e.trim()).toList();
+            final parts = cleaned.split(',').map((e) => e.trim());
 
-            String ing = parts.isNotEmpty
-                ? parts[0].replaceAll("ingredient:", "").trim()
-                : "";
-            String qty = parts.length > 1
-                ? parts[1].replaceAll("quantity:", "").trim()
-                : "";
-            String unit =
-                parts.length > 2 ? parts[2].replaceAll("unit:", "").trim() : "";
+            String ing = "";
+            String qty = "";
+            String unit = "";
+
+            for (var p in parts) {
+              if (p.startsWith("ingredient:")) {
+                ing = p.replaceFirst("ingredient:", "").trim();
+              } else if (p.startsWith("quantity:")) {
+                qty = p.replaceFirst("quantity:", "").trim();
+              } else if (p.startsWith("unit:")) {
+                unit = p.replaceFirst("unit:", "").trim();
+              }
+            }
 
             ingredients.add({
               'ingredient': TextEditingController(text: ing),
               'quantity': TextEditingController(text: qty),
-              'unit': TextEditingController(text: unit), // dropdown uses this
+              'unit': TextEditingController(text: unit),
             });
 
             ingredientErrors.add({
@@ -106,7 +115,7 @@ class MealController {
       }
     } catch (_) {}
 
-    /// STEPS PARSING
+    /// ---------------- STEPS PARSING ----------------
     try {
       final stepsData = meal['steps'];
 
@@ -131,13 +140,13 @@ class MealController {
     setState(() {});
   }
 
-  /// ADD / REMOVE INGREDIENTS
+  /// ---------------- ADD INGREDIENT ----------------
   void addIngredient() {
     setState(() {
       ingredients.add({
         'ingredient': TextEditingController(),
         'quantity': TextEditingController(),
-        'unit': TextEditingController(), // controlled by dropdown UI
+        'unit': TextEditingController(),
       });
 
       ingredientErrors.add({
@@ -148,6 +157,7 @@ class MealController {
     });
   }
 
+  /// ---------------- REMOVE INGREDIENT ----------------
   void removeIngredient(int index) {
     setState(() {
       ingredients[index]['ingredient']?.dispose();
@@ -159,7 +169,7 @@ class MealController {
     });
   }
 
-  /// ADD / REMOVE STEPS
+  /// ---------------- ADD STEP ----------------
   void addStep() {
     setState(() {
       steps.add(TextEditingController());
@@ -167,6 +177,7 @@ class MealController {
     });
   }
 
+  /// ---------------- REMOVE STEP ----------------
   void removeStep(int index) {
     setState(() {
       steps[index].dispose();
@@ -175,7 +186,7 @@ class MealController {
     });
   }
 
-  /// VALIDATION
+  /// ---------------- VALIDATION ----------------
   bool _validateInputs() {
     final name = mealNameController.text.trim();
     final desc = descriptionController.text.trim();
@@ -205,17 +216,19 @@ class MealController {
     for (int i = 0; i < steps.length; i++) {
       bool stErr = steps[i].text.trim().isEmpty;
       stepErrors[i] = stErr;
+
       if (stErr) stepErrorFound = true;
     }
 
     setState(() {});
+
     return !(showMealError ||
         showDescriptionError ||
         ingErrorFound ||
         stepErrorFound);
   }
 
-  /// RETURN FINAL MEAL MAP
+  /// ---------------- BUILD MEAL MAP ----------------
   Map<String, String> _buildMealMap() {
     Map<String, dynamic> map = {
       'name': mealNameController.text.trim(),
@@ -224,31 +237,45 @@ class MealController {
           .map((e) => {
                 'ingredient': e['ingredient']!.text,
                 'quantity': e['quantity']!.text,
-                'unit': e['unit']!.text, // comes from dropdown
+                'unit': e['unit']!.text,
               })
           .toList(),
       'steps': steps.map((e) => e.text).toList(),
     };
 
-    if (enabledFields['protein']!) map['protein'] = proteinController.text;
-    if (enabledFields['carbs']!) map['carbs'] = carbsController.text;
-    if (enabledFields['fats']!) map['fats'] = fatsController.text;
-    if (enabledFields['calories']!) map['calories'] = caloriesController.text;
+    if (enabledFields['protein']!) {
+      map['protein'] = proteinController.text;
+    }
+
+    if (enabledFields['carbs']!) {
+      map['carbs'] = carbsController.text;
+    }
+
+    if (enabledFields['fats']!) {
+      map['fats'] = fatsController.text;
+    }
+
+    if (enabledFields['calories']!) {
+      map['calories'] = caloriesController.text;
+    }
 
     return map.map((key, value) => MapEntry(key, value.toString()));
   }
 
+  /// ---------------- SAVE ----------------
   void saveMeal() {
     if (!_validateInputs()) return;
+
     Navigator.pop(context, _buildMealMap());
   }
 
   void saveEditedMeal(int index) {
     if (!_validateInputs()) return;
+
     Navigator.pop(context, _buildMealMap());
   }
 
-  /// CLEANUP
+  /// ---------------- CLEANUP ----------------
   void dispose() {
     mealNameController.dispose();
     descriptionController.dispose();

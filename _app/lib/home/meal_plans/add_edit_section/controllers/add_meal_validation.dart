@@ -38,7 +38,8 @@ class MealInputWidgets {
             decoration: InputDecoration(
               hintText: localError ? errorHint : hint,
               hintStyle: TextStyle(
-                  color: localError ? Colors.redAccent : Colors.white54),
+                color: localError ? Colors.redAccent : Colors.white54,
+              ),
               filled: true,
               fillColor: const Color(0xFF1E1E1E),
               border: InputBorder.none,
@@ -51,6 +52,7 @@ class MealInputWidgets {
     );
   }
 
+  /// SMALL FIELD (Ingredient / Qty)
   static Widget buildSmallFieldValidated(
     String hint,
     TextEditingController controller,
@@ -58,6 +60,8 @@ class MealInputWidgets {
     required String errorHint,
     VoidCallback? onValidInput,
   }) {
+    bool isQuantityField = hint.toLowerCase().contains("qty");
+
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller,
       builder: (context, value, _) {
@@ -74,21 +78,31 @@ class MealInputWidgets {
           ),
           child: TextField(
             controller: controller,
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-            ],
+
+            /// FIXED KEYBOARD TYPE
+            keyboardType: isQuantityField
+                ? const TextInputType.numberWithOptions(decimal: true)
+                : TextInputType.text,
+
+            /// ONLY APPLY NUMBER FILTER TO QTY
+            inputFormatters: isQuantityField
+                ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))]
+                : null,
+
             style: const TextStyle(color: Colors.white, fontSize: 13),
+
             onChanged: (_) {
               if (localError && controller.text.trim().isNotEmpty) {
                 onValidInput?.call();
               }
             },
+
             decoration: InputDecoration(
               hintText: localError ? errorHint : hint,
               hintStyle: TextStyle(
-                  color: localError ? Colors.redAccent : Colors.white54,
-                  fontSize: 13),
+                color: localError ? Colors.redAccent : Colors.white54,
+                fontSize: 13,
+              ),
               filled: true,
               fillColor: const Color(0xFF1E1E1E),
               border: InputBorder.none,
@@ -133,7 +147,8 @@ class MealInputWidgets {
             decoration: InputDecoration(
               hintText: localError ? errorHint : "Step details",
               hintStyle: TextStyle(
-                  color: localError ? Colors.redAccent : Colors.white54),
+                color: localError ? Colors.redAccent : Colors.white54,
+              ),
               filled: true,
               fillColor: const Color(0xFF1E1E1E),
               border: InputBorder.none,
@@ -150,7 +165,7 @@ class MealInputWidgets {
       String label, TextEditingController controller) {
     return TextField(
       controller: controller,
-      keyboardType: TextInputType.number,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
@@ -174,10 +189,14 @@ class MealInputWidgets {
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: Colors.white30),
           padding: const EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
-        child: Text("+ $label",
-            style: const TextStyle(color: Colors.white, fontSize: 14)),
+        child: Text(
+          "+ $label",
+          style: const TextStyle(color: Colors.white, fontSize: 14),
+        ),
       ),
     );
   }
