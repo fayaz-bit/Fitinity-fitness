@@ -90,11 +90,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 CircleAvatar(
                   radius: 55,
-                  backgroundImage: (user.imagePath?.isNotEmpty ?? false)
-                      ? FileImage(File(user.imagePath!))
+                  backgroundImage: (user.imagePath.isNotEmpty)
+                      ? FileImage(File(user.imagePath))
                       : null,
                   backgroundColor: Colors.grey[800],
-                  child: (user.imagePath?.isEmpty ?? true)
+                  child: (user.imagePath.isEmpty)
                       ? const Icon(
                           Icons.person,
                           color: Colors.white,
