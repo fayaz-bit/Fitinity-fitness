@@ -42,37 +42,61 @@ class TimerList extends StatelessWidget {
 
         const SizedBox(height: 25),
 
-        /// MINUTE CHIPS
+        /// TIMER OPTIONS
         Wrap(
           spacing: 14,
           runSpacing: 14,
           alignment: WrapAlignment.center,
-          children: controller.timerOptions.map((min) {
-            final isSelected = controller.selectedMinutes == min;
+          children: [
+            ...controller.timerOptions.map((min) {
+              final isSelected = controller.selectedMinutes == min;
 
-            return GestureDetector(
+              return GestureDetector(
+                onTap: controller.isRunning
+                    ? null
+                    : () => controller.changeMinutes(min, onUpdate),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                  decoration: BoxDecoration(
+                    gradient: isSelected ? violetGradient : null,
+                    color: isSelected ? null : darkGrey,
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  child: Text(
+                    "${min}min",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              );
+            }),
+
+            /// CUSTOM TIMER BUTTON
+            GestureDetector(
               onTap: controller.isRunning
                   ? null
-                  : () => controller.changeMinutes(min, onUpdate),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
+                  : () => _showCustomTimerDialog(context),
+              child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
                 decoration: BoxDecoration(
-                  gradient: isSelected ? violetGradient : null,
-                  color: isSelected ? null : darkGrey,
+                  color: darkGrey,
                   borderRadius: BorderRadius.circular(25),
                 ),
-                child: Text(
-                  "${min}min",
-                  style: const TextStyle(
+                child: const Text(
+                  "Custom",
+                  style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-            );
-          }).toList(),
+            ),
+          ],
         ),
 
         const SizedBox(height: 40),
@@ -121,8 +145,11 @@ class TimerList extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: darkGrey,
                   ),
-                  child: const Icon(Icons.refresh,
-                      color: Colors.white70, size: 22),
+                  child: const Icon(
+                    Icons.refresh,
+                    color: Colors.white70,
+                    size: 22,
+                  ),
                 ),
               ),
             ],
@@ -218,100 +245,46 @@ class TimerList extends StatelessWidget {
     );
   }
 
-  // ignore: unused_element
-  void _showTimerDialog(BuildContext context, String title) {
+  /// CUSTOM TIMER DIALOG
+  void _showCustomTimerDialog(BuildContext context) {
+    final TextEditingController customController = TextEditingController();
+
     showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                // Dark violet outer glow
-                BoxShadow(
-                  color: const Color(0xFF4B1FA3).withOpacity(0.7),
-                  blurRadius: 40,
-                  spreadRadius: 6,
-                ),
-                // Soft inner depth shadow
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.6),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 28,
-                vertical: 30,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF7B2FF7),
-                    Color(0xFF9A4DFF),
-                  ],
-                ),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.black.withOpacity(0.3),
-                    ),
-                    child: const Icon(
-                      Icons.timer_rounded,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  ),
-                  const SizedBox(height: 22),
-                  Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          "OK",
-                          style: TextStyle(
-                            color: Color(0xFF7B2FF7),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1C1C1E),
+          title: const Text(
+            "Custom Timer",
+            style: TextStyle(color: Colors.white),
+          ),
+          content: TextField(
+            controller: customController,
+            keyboardType: TextInputType.number,
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+              hintText: "Enter minutes",
+              hintStyle: TextStyle(color: Colors.white54),
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                final minutes = int.tryParse(customController.text.trim());
+
+                if (minutes != null && minutes > 0) {
+                  controller.setCustomMinutes(minutes, onUpdate);
+                }
+
+                Navigator.pop(context);
+              },
+              child: const Text("Set"),
+            ),
+          ],
         );
       },
     );
