@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
           /// Background Image (Your New Logo Image)
           SizedBox.expand(
             child: Image.asset(
-              "assets/project1/fitnesslevel/FITNITY fitness logo in vibrant hues.png",
+              "assets/project1/fitnesslevel/fitnity_logo.png",
               fit: BoxFit.cover,
             ),
           ),
