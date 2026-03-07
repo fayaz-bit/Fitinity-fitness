@@ -7,13 +7,16 @@ class PhoneLoginController {
 
   String? phoneError;
   String? passwordError;
-
   bool validate() {
     phoneError = null;
     passwordError = null;
 
-    if (phoneController.text.trim().isEmpty) {
+    String phone = phoneController.text.trim();
+
+    if (phone.isEmpty) {
       phoneError = "Enter phone number";
+    } else if (phone.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(phone)) {
+      phoneError = "Enter a valid 10 digit phone number";
     }
 
     if (passwordController.text.trim().isEmpty) {

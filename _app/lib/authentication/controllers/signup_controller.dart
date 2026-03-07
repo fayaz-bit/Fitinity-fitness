@@ -30,7 +30,15 @@ class SignUpController {
     String confirmPassword = confirmController.text.trim();
 
     if (name.isEmpty) nameError = "Enter name";
-    if (email.isEmpty) emailError = "Enter email";
+
+    if (email.isEmpty) {
+      emailError = "Enter email";
+    }
+    // Gmail validation
+    else if (!email.endsWith("@gmail.com")) {
+      emailError = "Email is unvalid";
+    }
+
     if (password.isEmpty) passwordError = "Enter password";
 
     if (confirmPassword.isEmpty) {
@@ -38,7 +46,6 @@ class SignUpController {
     } else if (password != confirmPassword) {
       confirmError = "Passwords do not match";
 
-      // Snackbar alert
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Enter the same password"),

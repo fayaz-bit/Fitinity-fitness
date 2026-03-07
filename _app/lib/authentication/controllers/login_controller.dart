@@ -16,10 +16,16 @@ class LoginController {
     emailError = null;
     passwordError = null;
 
-    // Validate BOTH fields first ( IMPORTANT FIX )
+    // Validate empty fields
     if (email.isEmpty || password.isEmpty) {
       if (email.isEmpty) emailError = "Enter your email";
       if (password.isEmpty) passwordError = "Enter your password";
+      return null;
+    }
+
+    // Gmail validation
+    if (!email.endsWith("@gmail.com")) {
+      emailError = "Email is unvalid";
       return null;
     }
 
