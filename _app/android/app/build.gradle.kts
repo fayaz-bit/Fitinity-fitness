@@ -5,28 +5,29 @@ plugins {
 }
 
 android {
-    namespace = "com.fitinity.fitness"  // Replace with your package name
+    namespace = "com.fitinity.fitness"
     compileSdk = 35
     ndkVersion = "29.0.14206865"
 
     defaultConfig {
-        applicationId = "com.fitinity.fitness"  // Replace with your package name
+        applicationId = "com.fitinity.fitness"
         minSdk = 21
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false      // Disable code shrinking
-            isShrinkResources = false    // Disable resource shrinking
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
+
         getByName("debug") {
             isMinifyEnabled = false
             isShrinkResources = false
