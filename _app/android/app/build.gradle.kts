@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -5,16 +8,16 @@ plugins {
 }
 
 android {
-    namespace = "com.fitinity.fitness"
+    namespace = "com.fitinity.fitnessapp"
     compileSdk = 35
     ndkVersion = "29.0.14206865"
 
     defaultConfig {
-        applicationId = "com.fitinity.fitness"
+        applicationId = "com.fitinity.fitnessapp"
         minSdk = 21
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
