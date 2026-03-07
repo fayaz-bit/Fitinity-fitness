@@ -32,16 +32,45 @@ class EditProfileController {
   Future<void> saveChanges(BuildContext context) async {
     if (currentUser == null) return;
 
+    String phoneText = phone.text.trim();
+    String emailText = email.text.trim();
+
+    // Phone validation
+    if (phoneText.length != 10 || !RegExp(r'^[0-9]+$').hasMatch(phoneText)) {
+      _showMessage(context, "Enter a valid 10 digit phone number", Colors.red);
+      return;
+    }
+
+    // Gmail validation
+    if (!emailText.endsWith("@gmail.com")) {
+      _showMessage(
+          context, "Email must be a valid @gmail.com address", Colors.red);
+      return;
+    }
+
     currentUser!
       ..name = name.text
-      ..phone = phone.text
-      ..email = email.text
+      ..phone = phoneText
+      ..email = emailText
       ..gender = gender.text
       ..age = int.tryParse(age.text) ?? currentUser!.age
       ..height = int.tryParse(height.text) ?? currentUser!.height
       ..weight = int.tryParse(weight.text) ?? currentUser!.weight;
 
     await EditProfileDB.saveUser(currentUser!);
+
+    _showMessage(context, "Profile updated successfully", Colors.green);
+
     Navigator.pop(context, true);
+  }
+
+  void _showMessage(BuildContext context, String msg, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 }
